@@ -1,21 +1,22 @@
+/*
+ * UnitMinAndNextToMin.h
+ *
+ *  Created on: Feb 3, 2015
+ *      Author: michelbuck
+ */
+
+#ifndef UNITMINANDNEXTTOMIN_H_
+#define UNITMINANDNEXTTOMIN_H_
+
+
 /*----------------------------------------------------------------
  *
  *  Written:       13/01/2014
  *  Last updated:  13/01/2014
  *
  *
- *  This class contains the methods necessary to test Fay's
- *  conjecture: the integral of the extrinsic curvature over a
- *  hypersurface sigma is equal to the rho->infinity limit of
- *
- *  const * rho^{(2-d)/2} * (Min(rho,sigma) - Max(rho,sigma))
- *
- *  where:
- *  const depends on the spacetime dimension only;
- *  Min(rho, sigma) is the number of minimal causet elements to the
- *  future of sigma;
- *  Max(rho, sigma) is the number of maximal causet elements to the
- *  past of sigma;
+ *  This class contains the methods necessary to produce the number of
+ *  minimal and next-to-minimal causet elements to the future of sigma
  *
  *----------------------------------------------------------------*/
 
@@ -34,133 +35,50 @@
 
 using namespace std;
 
-class TExtrinsicCurvature {
+class TMaxAndNextToMax {
 
 private:
     int dimension;
     double totalvolume;
-    TGeometry* GeometryAbove;
     TGeometry* GeometryBelow;
     double rhoexp;
-    int expSizeAbove;
     int expSizeBelow;
     int currentSprinklingSize;
 
 public:
     // constructor for fixed density analysis. specifies spacetime region below and above
     // the surface sigma.
-    TExtrinsicCurvature(int dimension, TGeometry *GeometryAbove, TGeometry *GeometryBelow,
-            double rhoexp) {
+    TMaxAndNextToMax(int dimension, TGeometry *GeometryBelow, double rhoexp) {
         this->dimension = dimension;
-        this->GeometryAbove = GeometryAbove;
         this->GeometryBelow = GeometryBelow;
-        this->totalvolume = GeometryAbove->V + GeometryBelow->V;
+        this->totalvolume = GeometryBelow->V;
         this->rhoexp = rhoexp;
-        this->expSizeAbove = (int) (rhoexp * (GeometryAbove->V));
         this->expSizeBelow = (int) (rhoexp * (GeometryBelow->V));
         this->currentSprinklingSize = 0;
     }
 
     // constructor for fixed number analysis. specifies spacetime region below and above
     // the surface sigma.
-    TExtrinsicCurvature(int dimension, TGeometry *GeometryAbove, TGeometry *GeometryBelow,
+    TMaxAndNextToMax(int dimension, TGeometry *GeometryBelow,
             int nexp) {
         this->dimension = dimension;
-        this->GeometryAbove = GeometryAbove;
         this->GeometryBelow = GeometryBelow;
-        this->totalvolume = GeometryAbove->V + GeometryBelow->V;
-        this->expSizeAbove = round(nexp / 2);
-        this->expSizeBelow = round(nexp / 2);
+        this->totalvolume = GeometryBelow->V;
+        this->expSizeBelow = round(nexp);
         this->rhoexp = nexp / totalvolume;
         this->currentSprinklingSize = 0;
     }
 
     // empty destructor
-    ~TExtrinsicCurvature() {
+    ~TMaxAndNextToMax() {
     }
 
     void setDensity(double density) {
         this->rhoexp = density;
-        this->expSizeAbove = round(this->rhoexp * GeometryAbove->V / 2);
-        this->expSizeBelow = round(this->rhoexp * GeometryBelow->V / 2);
+        this->expSizeBelow = round(this->rhoexp * GeometryBelow->V);
     }
 
-    // returns a vector with mean and standard deviation
-    vector<double> getNewStats(int N) {
-        vector<double> out;
-        double mean = 0;
-        double stdev = 0;
-        double current;
-        for (int i = 0; i < N; i++) {
-            current = this->c(this->dimension)
-                    * pow(rhoexp, 2.0 / dimension - 1.0)
-                    * getNewMinMinusMax();
-            mean += current;
-            stdev += current * current;
-        }
-        mean = mean / N;
-        stdev = sqrt((stdev - mean * mean * N) / (N - 1));
-        out.push_back(mean);
-        out.push_back(stdev);
-        out.push_back(stdev / sqrt((double) N));
-        return out;
-    }
-
-    // returns a vector with mean and standard deviation
-    void printNewDataAndStats(int N, ofstream* data, ofstream* stat) {
-        double mean = 0;
-        double stdev = 0;
-        double current;
-        double meanelements = 0;
-        std::clock_t start = std::clock();
-        for (int i = 0; i < N; i++) {
-            // print status to console
-            if ((i + 1) % (int)(N / 100) == 0) {
-                cout << "Progress: "
-                        << 100 * (double) (i + 1) / N
-                        << "\%"
-                        << endl;
-            }
-            // print ETA to console
-            if ((i + 1) == N / 20) {
-                cout << "PROJECTED TIME = "
-                        << 20 * (std::clock() - start) / (double) CLOCKS_PER_SEC
-                        << "s" << endl;
-            }
-            // find stats
-            current = getNewMinMinusMax();
-//                    * this->c(this->dimension)
-//                    * pow(rhoexp, 2.0 / dimension - 1.0);
-            meanelements += currentSprinklingSize;
-            (*data) << this->rhoexp << "\t" << current << "\n";
-            (*data).flush();
-            mean += current;
-            stdev += current * current;
-        }
-        meanelements = meanelements / N;
-        mean = mean / N;
-        stdev = sqrt((stdev - mean * mean * N) / (N - 1));
-        double totaltime = (std::clock() - start) / (double) CLOCKS_PER_SEC;
-        (*stat) << std::setw(0)
-                << N
-                << std::setw(16) << std::fixed << std::setprecision(4)
-                << this->rhoexp
-                << std::setw(16) << std::fixed << std::setprecision(4)
-                << this->rhoexp * this->totalvolume
-                << std::setw(16) << std::fixed << std::setprecision(3)
-                << meanelements
-                << std::setw(10) << std::fixed << std::setprecision(3)
-                << totaltime
-                << std::setw(10) << std::fixed << std::setprecision(3)
-                << mean
-                << std::setw(10) << std::fixed << std::setprecision(3)
-                << stdev
-                << endl;
-    }
-    ;
-
-    // returns a vector with mean and standard deviation
-    void printNewDataAndStatsDebug(int N, ofstream* data, ofstream* stat) {
+    void printNewMaxAndNextToMaxDataAndStats(int N, ofstream* data, ofstream* stat) {
         double mean = 0;
         double stdev = 0;
         double meanelements = 0;
@@ -180,15 +98,15 @@ public:
                         << "s" << endl;
             }
             // find stats
-            std::vector<int> minmax = getNewMinMinusMaxDebug();
+            std::vector<int> maxandnexttomax = getNewMaxAndNextToMax();
             //current = minmax[0];
 //                    * this->c(this->dimension)
 //                    * pow(rhoexp, 2.0 / dimension - 1.0)
             meanelements += currentSprinklingSize;
-            (*data) << this->rhoexp << "\t" << minmax[0] << "\t" << minmax[1] << "\n";
+            (*data) << this->rhoexp << "\t" << maxandnexttomax[0] << "\t" << maxandnexttomax[1] << "\n";
             (*data).flush();
-            mean += minmax[0];
-            stdev += minmax[0] * minmax[0];
+            mean += maxandnexttomax[0];
+            stdev += maxandnexttomax[0] * maxandnexttomax[0];
         }
         meanelements = meanelements / N;
         mean = mean / N;
@@ -212,31 +130,9 @@ public:
     };
 
 private:
-    int getNewMinMinusMax() {
-        TSprinkling* SprinklingAbove = new TSprinkling(expSizeAbove,
-                GeometryAbove);
-        TSprinkling* SprinklingBelow = new TSprinkling(expSizeBelow,
-                GeometryBelow);
-        this->currentSprinklingSize = SprinklingAbove->size
-                + SprinklingBelow->size;
-        int out = countMinimalElements(SprinklingAbove)
-                - countMaximalElements(SprinklingBelow);
-        delete SprinklingAbove;
-        delete SprinklingBelow;
-        return out;
-    }
-
-    std::vector<int> getNewMinMinusMaxDebug() {
-        std::vector<int> out;
-        TSprinkling* SprinklingAbove = new TSprinkling(expSizeAbove,
-                GeometryAbove);
-        TSprinkling* SprinklingBelow = new TSprinkling(expSizeBelow,
-                GeometryBelow);
-        this->currentSprinklingSize = SprinklingAbove->size
-                + SprinklingBelow->size;
-        out.push_back(countMinimalElements(SprinklingAbove));
-        out.push_back(countMaximalElements(SprinklingBelow));
-        delete SprinklingAbove;
+    std::vector<int> getNewMaxAndNextToMax() {
+        TSprinkling* SprinklingBelow = new TSprinkling(expSizeBelow, GeometryBelow);
+        std::vector<int> out = countMaximalAndSubMaximalElements(SprinklingBelow);
         delete SprinklingBelow;
         return out;
     }
@@ -270,7 +166,7 @@ private:
         for (int i = 0; i < Sprinkling->size - k; i++) {
             futureset = 0;
             j = i + 1;
-            while (futureset < k && (j < Sprinkling->size)) {
+            while (futureset <= k && (j < Sprinkling->size)) {
                 if (Sprinkling->prec(i, j)) futureset++;
                 j++;
             }
@@ -278,6 +174,25 @@ private:
         }
         return out;
     }
+
+    std::vector<int> countMaximalAndSubMaximalElements(TSprinkling* Sprinkling) {
+            std::vector<int> out;
+            out.push_back(0);
+            out.push_back(0);
+            int j = 0;
+            int futureset; // counts the elements to the future of i
+            for (int i = 0; i < Sprinkling->size; i++) {
+                futureset = 0;
+                j = i + 1;
+                while (futureset <= 1 && (j < Sprinkling->size)) {
+                    if (Sprinkling->prec(i, j)) futureset++;
+                    j++;
+                }
+                if (futureset == 0) out[0]++;
+                else if (futureset == 1) out[1]++;
+            }
+            return out;
+        }
 
     int countMinimalElements(TSprinkling *Sprinkling) {
         if (Sprinkling->size == 0) return 0;
@@ -325,3 +240,7 @@ private:
         else throw std::invalid_argument("I only know c(d) for d = 2 to d = 5.");
     }
 };
+
+
+
+#endif /* UNITMINANDNEXTTOMIN_H_ */

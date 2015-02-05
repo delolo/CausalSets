@@ -12,19 +12,17 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
   ../src/../include/UnitExtrinsicCurvature2.h \
   ../src/../include/UnitExtrinsicCurvatureSmeared.h \
   ../src/../include/UnitGeometry_AntiDeSitter3.h \
-  ../src/../include/UnitGeometry_dS2ConformalSlab.h \
-  ../src/../include/UnitGeometry_Minkowski2_Rectangle.h \
-  ../src/../include/UnitGeometry_MinkowskiD_Rectangle.h \
-  ../src/../include/UnitGeometry_Minkowski2_Diamond.h \
-  ../src/../include/UnitGeometry_Minkowski3_Cylinder.h \
-  ../src/../include/UnitGeometry_EinsteinStaticUniverseD.h \
   ../src/../include/UnitGeometry_CFTimeSquaredD_Rectangle.h \
-  ../src/../include/UnitGeometry_SpatialLinear2_Rectangle.h \
-  ../src/../include/UnitGeometry_SpatialExponential2_Rectangle.h \
+  ../src/../include/UnitGeometry_MinkowskiD_Rectangle.h \
+  ../src/../include/UnitGeometry_dS2ClosedSlab.h \
+  ../src/../include/UnitGeometry_dS2ConformalSlab.h \
   ../src/../include/UnitGeometry_dS4Global.h \
-  ../src/../include/UnitPropagator.h \
-  ../src/../include/UnitSprinklingLabeled.h \
-  ../src/../include/UnitPropagators.h \
+  ../src/../include/UnitGeometry_EinsteinStaticUniverseD.h \
+  ../src/../include/UnitGeometry_Minkowski2_Rectangle.h \
+  ../src/../include/UnitGeometry_Minkowski3_Cylinder.h \
+  ../src/../include/UnitGeometry_SpatialLinear2_Rectangle.h \
+  ../src/../include/UnitMaxAndNextToMax.h \
+  ../src/../include/UnitPropagator.h ../src/../include/UnitPropagators.h \
   /usr/local/include/eigen3/Eigen/Core \
   /usr/local/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/Macros.h \
@@ -32,8 +30,8 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/Constants.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/ForwardDeclarations.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/Meta.h \
-  /usr/local/include/eigen3/Eigen/src/Core/util/XprHelper.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/StaticAssert.h \
+  /usr/local/include/eigen3/Eigen/src/Core/util/XprHelper.h \
   /usr/local/include/eigen3/Eigen/src/Core/util/Memory.h \
   /usr/local/include/eigen3/Eigen/src/Core/NumTraits.h \
   /usr/local/include/eigen3/Eigen/src/Core/MathFunctions.h \
@@ -74,6 +72,7 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
   /usr/local/include/eigen3/Eigen/src/Core/Map.h \
   /usr/local/include/eigen3/Eigen/src/Core/Block.h \
   /usr/local/include/eigen3/Eigen/src/Core/VectorBlock.h \
+  /usr/local/include/eigen3/Eigen/src/Core/Ref.h \
   /usr/local/include/eigen3/Eigen/src/Core/Transpose.h \
   /usr/local/include/eigen3/Eigen/src/Core/DiagonalMatrix.h \
   /usr/local/include/eigen3/Eigen/src/Core/Diagonal.h \
@@ -107,6 +106,7 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
   /usr/local/include/eigen3/Eigen/src/Core/products/TriangularSolverMatrix.h \
   /usr/local/include/eigen3/Eigen/src/Core/products/TriangularSolverVector.h \
   /usr/local/include/eigen3/Eigen/src/Core/BandMatrix.h \
+  /usr/local/include/eigen3/Eigen/src/Core/CoreIterators.h \
   /usr/local/include/eigen3/Eigen/src/Core/BooleanRedux.h \
   /usr/local/include/eigen3/Eigen/src/Core/Select.h \
   /usr/local/include/eigen3/Eigen/src/Core/VectorwiseOp.h \
@@ -170,7 +170,10 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
   /usr/local/include/eigen3/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h \
   /usr/local/include/eigen3/Eigen/src/Eigenvalues/ComplexSchur.h \
   /usr/local/include/eigen3/Eigen/src/Eigenvalues/ComplexEigenSolver.h \
-  /usr/local/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h
+  /usr/local/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
+  /usr/local/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
+  /usr/local/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
+  ../src/../include/UnitSprinklingLabeled.h
 
 ../src/../include/Statistics.h:
 
@@ -206,29 +209,27 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
 
 ../src/../include/UnitGeometry_AntiDeSitter3.h:
 
-../src/../include/UnitGeometry_dS2ConformalSlab.h:
-
-../src/../include/UnitGeometry_Minkowski2_Rectangle.h:
+../src/../include/UnitGeometry_CFTimeSquaredD_Rectangle.h:
 
 ../src/../include/UnitGeometry_MinkowskiD_Rectangle.h:
 
-../src/../include/UnitGeometry_Minkowski2_Diamond.h:
+../src/../include/UnitGeometry_dS2ClosedSlab.h:
 
-../src/../include/UnitGeometry_Minkowski3_Cylinder.h:
-
-../src/../include/UnitGeometry_EinsteinStaticUniverseD.h:
-
-../src/../include/UnitGeometry_CFTimeSquaredD_Rectangle.h:
-
-../src/../include/UnitGeometry_SpatialLinear2_Rectangle.h:
-
-../src/../include/UnitGeometry_SpatialExponential2_Rectangle.h:
+../src/../include/UnitGeometry_dS2ConformalSlab.h:
 
 ../src/../include/UnitGeometry_dS4Global.h:
 
-../src/../include/UnitPropagator.h:
+../src/../include/UnitGeometry_EinsteinStaticUniverseD.h:
 
-../src/../include/UnitSprinklingLabeled.h:
+../src/../include/UnitGeometry_Minkowski2_Rectangle.h:
+
+../src/../include/UnitGeometry_Minkowski3_Cylinder.h:
+
+../src/../include/UnitGeometry_SpatialLinear2_Rectangle.h:
+
+../src/../include/UnitMaxAndNextToMax.h:
+
+../src/../include/UnitPropagator.h:
 
 ../src/../include/UnitPropagators.h:
 
@@ -246,9 +247,9 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
 
 /usr/local/include/eigen3/Eigen/src/Core/util/Meta.h:
 
-/usr/local/include/eigen3/Eigen/src/Core/util/XprHelper.h:
-
 /usr/local/include/eigen3/Eigen/src/Core/util/StaticAssert.h:
+
+/usr/local/include/eigen3/Eigen/src/Core/util/XprHelper.h:
 
 /usr/local/include/eigen3/Eigen/src/Core/util/Memory.h:
 
@@ -330,6 +331,8 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
 
 /usr/local/include/eigen3/Eigen/src/Core/VectorBlock.h:
 
+/usr/local/include/eigen3/Eigen/src/Core/Ref.h:
+
 /usr/local/include/eigen3/Eigen/src/Core/Transpose.h:
 
 /usr/local/include/eigen3/Eigen/src/Core/DiagonalMatrix.h:
@@ -395,6 +398,8 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
 /usr/local/include/eigen3/Eigen/src/Core/products/TriangularSolverVector.h:
 
 /usr/local/include/eigen3/Eigen/src/Core/BandMatrix.h:
+
+/usr/local/include/eigen3/Eigen/src/Core/CoreIterators.h:
 
 /usr/local/include/eigen3/Eigen/src/Core/BooleanRedux.h:
 
@@ -522,4 +527,10 @@ src/CausalSets.d: ../src/CausalSets.cpp ../src/../include/Statistics.h \
 
 /usr/local/include/eigen3/Eigen/src/Eigenvalues/ComplexEigenSolver.h:
 
+/usr/local/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h:
+
+/usr/local/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h:
+
 /usr/local/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h:
+
+../src/../include/UnitSprinklingLabeled.h:

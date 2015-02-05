@@ -8,7 +8,11 @@
  *----------------------------------------------------------------*/
 
 #include <cmath>
+#include <cstdio>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -24,23 +28,57 @@
 #include "../include/UnitExtrinsicCurvatureSmeared.h"
 #include "../include/UnitGeometry_AntiDeSitter2.h"
 #include "../include/UnitGeometry_AntiDeSitter3.h"
-#include "../include/UnitGeometry_dS2ConformalSlab.h"
-#include "../include/UnitGeometry_Minkowski2_Rectangle.h"
-#include "../include/UnitGeometry_MinkowskiD_Rectangle.h"
-#include "../include/UnitGeometry_Minkowski2_Diamond.h"
-#include "../include/UnitGeometry_Minkowski3_Cylinder.h"
-#include "../include/UnitGeometry_EinsteinStaticUniverseD.h"
 #include "../include/UnitGeometry_CFTimeSquaredD_Rectangle.h"
-#include "../include/UnitGeometry_SpatialLinear2_Rectangle.h"
-#include "../include/UnitGeometry_SpatialExponential2_Rectangle.h"
+#include "../include/UnitGeometry_dS2ClosedSlab.h"
+#include "../include/UnitGeometry_dS2ConformalSlab.h"
 #include "../include/UnitGeometry_dS4Global.h"
-#include "../include/UnitGeometry.h"
+#include "../include/UnitGeometry_EinsteinStaticUniverseD.h"
+#include "../include/UnitGeometry_Minkowski2_Rectangle.h"
+#include "../include/UnitGeometry_Minkowski3_Cylinder.h"
+#include "../include/UnitGeometry_MinkowskiD_Rectangle.h"
+#include "../include/UnitGeometry_SpatialLinear2_Rectangle.h"
+#include "../include/UnitMaxAndNextToMax.h"
 #include "../include/UnitPropagator.h"
-#include "../include/UnitSprinklingLabeled.h"
-#include "../include/UnitSprinkling.h"
 #include "../include/UnitPropagators.h"
+#include "../include/UnitSprinkling.h"
+#include "../include/UnitSprinklingLabeled.h"
 
 using namespace std;
+
+void testNumberOfChainsDS2ClosedSlab() {
+    double density = 1.0;
+    double alpha = 1.0;
+    int RUNS = 100;
+    double etatop;
+
+    ofstream datafile;
+
+    datafile.open(currentDate() + "-ds2-closedslab-numberofpaths.txt",ios::app);
+
+    //datafile << "eta \t\t N \t\t C2" << endl;
+
+    int relations;
+
+    for (int k = 14; k <= 15; k++) {
+        etatop = 0.5 * PI * (1.0 - pow(2.0,-k));
+        for (int run = 0; run < RUNS; run++) {
+
+            cout << "starting..." << endl;
+            TGeometry* Geometry = new TGeometry_dS2ClosedSlab(alpha, etatop);
+
+            cout << "run " << run << " for etatop = " << (1.0 - pow(2.0,-k)) << " * PI/2" << endl;
+            cout << "expected size of causet   = " << Geometry->V << endl;
+            cout << "number of causets sampled = " << RUNS << endl;
+            Timer* timer = new Timer("stats");
+            TSprinkling* Sprinkling = new TSprinkling(density, Geometry);
+            TConnection* Connection = new TConnection(Sprinkling, false, false);
+            relations = Connection->relations();
+            datafile << etatop << "\t\t" << Geometry->V << "\t\t" << relations << endl;
+            timer->stop();
+        }
+    }
+    datafile.close();
+}
 
 void testPropagator() {
 
@@ -330,7 +368,7 @@ void testExtrinsicCurvatureMink2() {
 void testExtrinsicCurvatureMinkowskiDRectangle() {
     cout << "Starting..." << endl;
 
-    int dimension = 4;
+    int dimension = 3;
     int RUNS = 100;
 
     double L = 1.0;
@@ -360,12 +398,12 @@ void testExtrinsicCurvatureMinkowskiDRectangle() {
             << "-L"
             << fixed << setprecision(0) << L
             << "-T1-stat.txt";
-    datafile.open(datafilename.str(), ios::app);
-    statfile.open(statfilename.str(), ios::app);
+    datafile.open(datafilename.str());
+    statfile.open(statfilename.str());
 
     double nexp;
     double rhoexp;
-    for (int k = 10; k < 11; k++) {
+    for (int k = 10; k < 41; k++) {
         nexp = pow(2.0, (double) k / 2.0);
         rhoexp = nexp / (GeometryAbove->V + GeometryBelow->V);
         cout << "expected density          = " << rhoexp << endl;
@@ -375,6 +413,185 @@ void testExtrinsicCurvatureMinkowskiDRectangle() {
         TExtrinsicCurvature* Curvature = new TExtrinsicCurvature(dimension,
                 GeometryAbove, GeometryBelow, rhoexp);
         Curvature->printNewDataAndStats(RUNS, &datafile, &statfile);
+        //datafile.flush();
+        cout << "Analytic result  = " << 0.0 << endl;
+        timer->stop();
+
+        delete Curvature;
+        delete timer;
+    }
+    datafile.close();
+    statfile.close();
+    delete GeometryAbove;
+    delete GeometryBelow;
+}
+
+void testMinAndMaxMinkowskiDRectangle() {
+    cout << "Starting..." << endl;
+
+    int dimension = 4;
+    int RUNS = 100;
+
+    double L = 1.0;
+    vector<double> xmax;
+    xmax.resize(dimension - 1, L);
+    cout << vecToString(xmax);
+
+    TGeometry* GeometryAbove =
+            new TGeometry_MinkowskiD_Rectangle(dimension, xmax, 0.5);
+    TGeometry* GeometryBelow =
+            new TGeometry_MinkowskiD_Rectangle(dimension, xmax, 0.5);
+    ofstream datafile, statfile;
+    stringstream datafilename, statfilename;
+    datafilename << currentDate()
+            << "minandmax-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-data.txt";
+    statfilename << currentDate()
+            << "minandmax-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-stat.txt";
+    datafile.open(datafilename.str());
+    statfile.open(statfilename.str());
+
+    double nexp;
+    double rhoexp;
+    for (int k = 40; k < 41; k++) {
+        nexp = pow(2.0, (double) k / 2.0);
+        rhoexp = nexp / (GeometryAbove->V + GeometryBelow->V);
+        cout << "expected density          = " << rhoexp << endl;
+        cout << "number of causets sampled = " << RUNS << endl;
+
+        Timer* timer = new Timer("stats");
+        TExtrinsicCurvature* Curvature = new TExtrinsicCurvature(dimension,
+                GeometryAbove, GeometryBelow, rhoexp);
+        Curvature->printNewDataAndStatsDebug(RUNS, &datafile, &statfile);
+        //datafile.flush();
+        cout << "Analytic result  = " << 0.0 << endl;
+        timer->stop();
+
+        delete Curvature;
+        delete timer;
+    }
+    datafile.close();
+    statfile.close();
+    delete GeometryAbove;
+    delete GeometryBelow;
+}
+
+void testMaxAndNextToMaxMinkowskiDRectangle() {
+    cout << "Starting..." << endl;
+
+    int dimension = 4;
+    int RUNS = 500;
+
+    double L = 1.0;
+    vector<double> xmax;
+    xmax.resize(dimension - 1, L);
+    cout << vecToString(xmax);
+
+    TGeometry* GeometryBelow =
+            new TGeometry_MinkowskiD_Rectangle(dimension, xmax, 0.5);
+    ofstream datafile, statfile;
+    stringstream datafilename, statfilename;
+    datafilename << currentDate()
+            << "maxandnexttomax-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-data.txt";
+    statfilename << currentDate()
+            << "maxandnexttomax-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-stat.txt";
+    datafile.open(datafilename.str());
+    statfile.open(statfilename.str());
+
+    double nexp;
+    double rhoexp;
+    for (int k = 1; k < 40; k++) {
+        nexp = pow(2.0, (double) k / 2.0);
+        rhoexp = nexp / (GeometryBelow->V);
+        cout << "expected density          = " << rhoexp << endl;
+        cout << "number of causets sampled = " << RUNS << endl;
+
+        Timer* timer = new Timer("stats");
+        TMaxAndNextToMax* Curvature = new TMaxAndNextToMax(dimension, GeometryBelow, rhoexp);
+        Curvature->printNewMaxAndNextToMaxDataAndStats(RUNS, &datafile, &statfile);
+        //datafile.flush();
+        cout << "Analytic result  = " << 0.0 << endl;
+        timer->stop();
+
+        delete Curvature;
+        delete timer;
+    }
+    datafile.close();
+    statfile.close();
+    delete GeometryBelow;
+}
+
+void testExtrinsicCurvatureMinkowskiDRectangleDebug() {
+    cout << "Starting..." << endl;
+
+    int dimension = 2;
+    int RUNS = 100;
+
+    double L = 1.0;
+    vector<double> xmax;
+    xmax.resize(dimension - 1, L);
+    cout << vecToString(xmax);
+
+    TGeometry* GeometryAbove =
+            new TGeometry_MinkowskiD_Rectangle(dimension, xmax, 0.5);
+    TGeometry* GeometryBelow =
+            new TGeometry_MinkowskiD_Rectangle(dimension, xmax, 0.5);
+    ofstream datafile, statfile;
+    stringstream datafilename, statfilename;
+    datafilename << currentDate()
+            << "min-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-data.txt";
+    statfilename << currentDate()
+            << "min-mink"
+            << dimension
+            << "-runs"
+            << RUNS
+            << "-L"
+            << fixed << setprecision(0) << L
+            << "-T1-stat.txt";
+    datafile.open(datafilename.str(), ios::app);
+    statfile.open(statfilename.str(), ios::app);
+
+    double nexp;
+    double rhoexp;
+    for (int k = 3; k < 37; k++) {
+        nexp = pow(2.0, (double) k / 2.0);
+        rhoexp = nexp / (GeometryAbove->V + GeometryBelow->V);
+        cout << "expected density          = " << rhoexp << endl;
+        cout << "number of causets sampled = " << RUNS << endl;
+
+        Timer* timer = new Timer("stats");
+        TExtrinsicCurvature* Curvature = new TExtrinsicCurvature(dimension,
+                GeometryAbove, GeometryBelow, rhoexp);
+        Curvature->printNewDataAndStatsDebug(RUNS, &datafile, &statfile);
         cout << "Analytic result  = " << 0.0 << endl;
         timer->stop();
 
@@ -473,12 +690,12 @@ void testExtrinsicCurvatureTimeSquaredDRectangle() {
     datafile.open(datafilename.str(), ios::app);
     statfile.open(statfilename.str(), ios::app);
 
-    datafile << "# This is data for an N = 2^12 sprinkling into the"  << endl
-             << "# [0,1]^3 x [1,20] slab of the TimeLinear4 spacetime"<< endl
-             << "# for ts=4,...,17." << endl;
-    statfile << "# This is data for an N = 2^12 sprinkling into the"  << endl
-             << "# [0,1]^3 x [1,20] slab of the TimeLinear4 spacetime"<< endl
-             << "# for ts=4,...,17." << endl;
+    datafile << "# This is data for an N = 2^12 sprinkling into the" << endl
+            << "# [0,1]^3 x [1,20] slab of the TimeLinear4 spacetime" << endl
+            << "# for ts=4,...,17." << endl;
+    statfile << "# This is data for an N = 2^12 sprinkling into the" << endl
+            << "# [0,1]^3 x [1,20] slab of the TimeLinear4 spacetime" << endl
+            << "# for ts=4,...,17." << endl;
 
     for (int t = 4; t < 17; t++) {
         double T = (double) t;
@@ -645,7 +862,7 @@ void testExtrinsicCurvatureSmearedMink3() {
 void testExtrinsicCurvature2MinkowskiDRectangle() {
     cout << "Starting..." << endl;
 
-    int dimension = 4;
+    int dimension = 2;
     int RUNS = 100;
 
     double L = 1.0;
@@ -1348,8 +1565,14 @@ int main() {
     //testSprinkling();
     //testExtrinsicCurvatureMink3Cylinder();
     //testExtrinsicCurvatureSmearedMink3();
-    testExtrinsicCurvature2MinkowskiDRectangle();
+    //testExtrinsicCurvatureMinkowskiDRectangleDebug();
+    //testNumberOfChainsDS2ClosedSlab();
+    //testExtrinsicCurvatureMinkowskiDRectangle();
+    testMinAndMaxMinkowskiDRectangle();
+    //testMaxAndNextToMaxMinkowskiDRectangle();
     //testExtrinsicCurvatureTimeSquaredDRectangle();
-    cout << "ALL DONE." << endl;
+    cout << "******************************" << endl;
+    cout << "********** ALL DONE **********" << endl;
+    cout << "******************************" << endl;
     //cout << NRt0(1.0, 0.0000000001) << endl;
 }
